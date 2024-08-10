@@ -1,6 +1,3 @@
-section .bss
-	str_len	db ?				; where length of parameter is written
-
 section .text
 global _start
 
