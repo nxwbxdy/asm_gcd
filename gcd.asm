@@ -17,10 +17,14 @@ global _start
 _start:
 	push	rbp, 				; save rbp
 	mov	rbp, rsp			; set stack
+	
+	; if argc != 3 exit_error
+	mov	dil, [rbp + 0x8]		; argc
+	cmp	dil, 3
+	jnz	exit_error
+	jz	exit_success			; tmp
+
 	lea	rdx, [rbp + 0x10]		; load argv[0] index			; get address of argv[0]
-	mov	dil, [rbp + 0x8]		; argc:w
-	cmp	dil, 1
-	jz	exit_error
 	add	rdx, 0x8			; next param -> argv[1]			; inc address to argv[1]
 	;add	rdx, 0x8			; next param -> argv[2]
 	push	qword [rdx]			; char* of argv[1] on stack		; push char* to stack
