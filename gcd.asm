@@ -22,13 +22,14 @@ _start:
 	mov	dil, [rbp + 0x8]		; argc
 	cmp	dil, 3
 	jnz	exit_error
-	jz	exit_success			; tmp
 
 	lea	rdx, [rbp + 0x10]		; load argv[0] index			; get address of argv[0]
 	add	rdx, 0x8			; next param -> argv[1]			; inc address to argv[1]
 	;add	rdx, 0x8			; next param -> argv[2]
 	push	qword [rdx]			; char* of argv[1] on stack		; push char* to stack
-	call	get_len				; get len into rax
+	call	check_valid_number
+	jmp	exit_rax
+	;call	get_len				; get len into rax
 	jmp	exit_rax			; return code is input len argv[1]
 
 ; number = [rbp + 0x10]
@@ -40,10 +41,12 @@ check_valid_number:
 	mov	rbp, rsp
 
 	; validation
-	mov	rdx, [rbp + 0x10]		; rbp + 0x8 -> rip	; + 0x10 -> 8 byte
-	cmp	rdx, 0x30			; '0'
+	mov	rdi, [rbp + 0x10]		; rbp + 0x8 -> rip	; + 0x10 -> 8 byte
+	;xor	rdx, rdx			; set 0
+	mov	rdx, [rdi]			; rbp + 0x8 -> rip	; + 0x10 -> 8 byte
+	cmp	dl, 0x30			; '0'
 	jl	return_error			; < '0'
-	cmp	rdx, 0x39			; '9'
+	cmp	dl, 0x39			; '9'
 	jg	return_error			; > '9'
 	mov	rax, 0				; return success
 
