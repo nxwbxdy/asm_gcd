@@ -17,11 +17,15 @@ global _start
 _start:
 	push	rbp, 				; save rbp
 	mov	rbp, rsp			; set stack
-	lea	rdx, [rbp + 0x10]		; load argv[0] index
-	add	rdx, 0x8			; next param -> argv[1]
-	mov	rbx, [rdx]			; mov to rax for status printing
-	mov	rax, [rbx]			; mov to rax for status printing
-	jmp	exit_rax
+	lea	rdx, [rbp + 0x10]		; load argv[0] index			; get address of argv[0]
+	mov	dil, [rbp + 0x8]		; argc:w
+	cmp	dil, 1
+	jz	exit_error
+	add	rdx, 0x8			; next param -> argv[1]			; inc address to argv[1]
+	;add	rdx, 0x8			; next param -> argv[2]
+	push	qword [rdx]			; char* of argv[1] on stack		; push char* to stack
+	call	get_len				; get len into rax
+	jmp	exit_rax			; return code is input len argv[1]
 
 ; number = [rbp + 0x10]
 ; return 0 -> success
@@ -54,16 +58,16 @@ get_len:
 	push	rbp
 	mov	rbp, rsp
 
-	lea	rdx, [rbp + 0x10]		; load address of string
+	mov	rdx, [rbp + 0x10]		; load address of string
 	xor	rcx, rcx
 loop_count:
 	; rdi -> data index
-	mov	rdi, [rdx + rcx]
-	cmp	rdi, 0x0
+	mov	dil, [rdx + rcx]
+	cmp	dil, 0x0
 	inc	rcx
 	jne	loop_count
 	;end_loop
-	mov	rax, rcx
+	mov	rax, rcx			; return code (rax) is len
 	mov	rsp, rbp
 	pop	rbp
 	ret
