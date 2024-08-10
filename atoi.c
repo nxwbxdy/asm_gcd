@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 
 int main(int argc, char* argv[]){
 
@@ -10,9 +9,12 @@ int main(int argc, char* argv[]){
 	}
 
 	char c;					// character from argv string
-	int i = strlen(argv[1]);		// index for string to char
+	int i = 0;				// length of string counter
 	int fact = 1;				// fact of index
 	int sum = 0;				// sum of convertion
+	
+	while(argv[1][i++]);			// string length counter
+	i--;					// remove 1 from '\0'
 
 	while(i--){
 		c = argv[1][i];
