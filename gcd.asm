@@ -9,20 +9,17 @@ global _start
 ; RDI 	-> 	ARG1
 ; RSI 	-> 	ARG2
 ; RDX 	-> 	ARG3
+; [ ... ]
 
 ; RETURN 	-> 	RAX
 ; COUNTER 	-> 	RCX
 ; DATA		->	RDX
 
-; ERROR CODES
-; BAD NUMBER	->	1
-; BAD CHAR	->	2
-
 _start:
 	push	rbp, 				; save rbp
 	mov	rbp, rsp			; set stack
 	
-	; if argc != 3 exit_error
+	; if argc != 3 print params and exit
 	mov	dil, [rbp + 0x8]		; argc
 	cmp	dil, 3
 	jnz	print_params_and_exit
@@ -31,9 +28,9 @@ _start:
 	add	rdx, 0x8			; next param -> argv[1]			; inc address to argv[1]
 	;add	rdx, 0x8			; next param -> argv[2]
 	push	qword [rdx]			; char* of argv[1] on stack		; push char* to stack
-	call	check_valid_number
-	jmp	exit_rax
-	;call	get_len				; get len into rax
+	; works:
+	;call	check_valid_number		
+	call	get_len				; get len into rax
 	jmp	exit_rax			; return code is input len argv[1]
 
 ; number = [rbp + 0x10]
@@ -74,9 +71,10 @@ get_len:
 loop_count:
 	; rdi -> data index
 	mov	dil, [rdx + rcx]
-	cmp	dil, 0x0
 	inc	rcx
-	jne	loop_count
+	cmp	dil, 0x0
+	jnz	loop_count
+	dec	rcx
 	;end_loop
 	mov	rax, rcx			; return code (rax) is len
 	mov	rsp, rbp
