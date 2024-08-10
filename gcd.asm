@@ -1,3 +1,7 @@
+section  .data
+bad_param	db	"Bad number of parameters", 0xa, "Usage: <program> <num1> <num2>", 0xa, 0
+bad_param_len	equ	$ - bad_param
+
 section .text
 global _start
 
@@ -21,7 +25,7 @@ _start:
 	; if argc != 3 exit_error
 	mov	dil, [rbp + 0x8]		; argc
 	cmp	dil, 3
-	jnz	exit_error
+	jnz	print_params_and_exit
 
 	lea	rdx, [rbp + 0x10]		; load argv[0] index			; get address of argv[0]
 	add	rdx, 0x8			; next param -> argv[1]			; inc address to argv[1]
@@ -98,6 +102,14 @@ atoi:
 	mov	rsp, rbp
 	pop	rbp
 	ret
+
+print_params_and_exit:
+	mov	rax, 0x1
+	mov	rdi, 0x1
+	mov	rsi, bad_param
+	mov	rdx, bad_param_len
+	syscall
+	jmp	exit_error
 
 exit_error:
 	mov	rax, 0x3c			; syscall(exit)
