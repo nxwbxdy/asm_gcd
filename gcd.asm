@@ -17,7 +17,10 @@ global _start
 _start:
 	push	rbp, 				; save rbp
 	mov	rbp, rsp			; set stack
-	mov	rdx, [rbp + 0x18] + 0x8		; argv[1] index
+	lea	rdx, [rbp + 0x10]		; load argv[0] index
+	add	rdx, 0x8			; next param -> argv[1]
+	mov	rbx, [rdx]			; mov to rax for status printing
+	mov	rax, [rbx]			; mov to rax for status printing
 	jmp	exit_rax
 
 ; number = [rbp + 0x10]
